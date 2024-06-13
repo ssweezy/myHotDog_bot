@@ -1,3 +1,4 @@
+import logging
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -20,6 +21,7 @@ async def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     try:
         print("Bot started")
         asyncio.run(main())
