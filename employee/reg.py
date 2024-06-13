@@ -14,7 +14,7 @@ router = Router()
 
 
 # приветствие и запрос пароля
-@router.message(Command('test'))
+@router.message(Command('start'))
 async def hello(message: Message, bot: Bot, state: FSMContext):
     await message.answer(f"👋 Приветствуем {message.from_user.username}!")
     msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")

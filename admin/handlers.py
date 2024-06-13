@@ -14,7 +14,7 @@ class Employee(StatesGroup):
     full_name = State()
 
 
-@router.message(Command('start'))
+@router.message(Command('test'))
 async def test(message: Message, bot: Bot):
     msg = await message.answer('Добро пожаловать, {имя}!', reply_markup = kb.main)
     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-1)
