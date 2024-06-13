@@ -23,6 +23,7 @@ class User(Base):
     category: Mapped[str] = mapped_column(String(20))
     name: Mapped[str] = mapped_column(String(30))
     surname: Mapped[str] = mapped_column(String(30))
+    birthday: Mapped[str] = mapped_column(String(30))
     phone: Mapped[str] = mapped_column(String(30))
     reg_date: Mapped[str] = mapped_column(String(40))
 

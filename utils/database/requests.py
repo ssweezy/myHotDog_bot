@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 
 async def set_user(data):
-    tg_id, tg_username, role, category, name, surname, phone, reg_date = data
+    tg_id, tg_username, role, category, name, surname,birthday ,phone, reg_date = data
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
@@ -15,6 +15,7 @@ async def set_user(data):
                              category=category,
                              name=name,
                              surname=surname,
+                             birthday=birthday,
                              phone=phone,
                              reg_date=reg_date
                              ))

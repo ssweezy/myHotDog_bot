@@ -86,6 +86,21 @@ async def get_surname(message: Message, bot: Bot ,state: FSMContext):
     await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                      f"\nИмя - {data["name"]}"
                                      f"\nФамилия - {data["surname"]}"
+                                     f"\nВведите <b>дату рождения:</b>", chat_id=message.chat.id,
+                                message_id=data["msg_id"])
+    await state.set_state(Reg.birthday)
+
+
+# день рождения
+@router.message(Reg.birthday)
+async def get_birthday(message: Message, bot: Bot ,state: FSMContext):
+    await state.update_data(birthday=message.text)
+    data = await state.get_data()
+    await message.delete()
+    await bot.edit_message_text(text=f"<b>Ваши данные</b>"
+                                     f"\nИмя - {data["name"]}"
+                                     f"\nФамилия - {data["surname"]}"
+                                     f"\nДата рождения - {data["birthday"]}"
                                      f"\nВведите <b>номер телефона:</b>", chat_id=message.chat.id,
                                 message_id=data["msg_id"])
     await state.set_state(Reg.phoneNum)
@@ -103,6 +118,7 @@ async def get_phone(message: Message, bot: Bot, state: FSMContext):
         await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                          f"\nИмя - {data["name"]}"
                                          f"\nФамилия - {data["surname"]}"
+                                         f"\nДата рождения - {data["birthday"]}"
                                          f"\nТелефон - {data["phone"]}"
                                          f"\nВведите <b>свою роль</b>", chat_id=message.chat.id,
                                     message_id=data["msg_id"])
@@ -113,6 +129,7 @@ async def get_phone(message: Message, bot: Bot, state: FSMContext):
         await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                          f"\nИмя - {data["name"]}"
                                          f"\nФамилия - {data["surname"]}"
+                                         f"\nДата рождения - {data["birthday"]}"
                                          f"\nТелефон - {data["phone"]}"
                                          f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
                                     message_id=data["msg_id"], reply_markup=main)
@@ -127,6 +144,7 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
     await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                      f"\nИмя - {data["name"]}"
                                      f"\nФамилия - {data["surname"]}"
+                                     f"\nДата рождения - {data["birthday"]}"
                                      f"\nТелефон - {data["phone"]}"
                                      f"\nРоль - {data["role"]}"
                                      f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
@@ -148,6 +166,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
             data["category"],
             data["name"],
             data["surname"],
+            data["birthday"],
             data["phone"],
             str(datetime.now())[:19]
             ]

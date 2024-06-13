@@ -5,6 +5,7 @@ class Reg(StatesGroup):
     password = State()
     name = State()
     surname = State()
+    birthday = State()
     phoneNum = State()
     role = State()
 
