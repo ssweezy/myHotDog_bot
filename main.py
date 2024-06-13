@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 from utils.config import TOKEN
 from utils.database.models import async_main
 
-from employee.handlers import router
+from employee.reg import router
 
 
 async def main():

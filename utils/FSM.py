@@ -10,5 +10,8 @@ class Reg(StatesGroup):
     role = State()
 
 
-class Regular(StatesGroup):
-    menu = State()
+class Menu(StatesGroup):
+    emp_menu = State()
+    adm_menu = State()
+    cabinet = State()
+    points = State()

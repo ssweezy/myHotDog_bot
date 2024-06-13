@@ -20,3 +20,4 @@ async def set_user(data):
                              reg_date=reg_date
                              ))
             await session.commit()
+

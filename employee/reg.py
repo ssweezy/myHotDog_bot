@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from utils.database.requests import set_user
 from utils.FSM import Reg
 from utils.config import PASSWORD, PASSWORD_ADMIN
-from utils.kb.inline_kb import main
+from utils.kb.inline_kb import acceptation, emp_menu_kb, adm_menu_kb
 
 router = Router()
 
@@ -132,7 +132,7 @@ async def get_phone(message: Message, bot: Bot, state: FSMContext):
                                          f"\nДата рождения - {data["birthday"]}"
                                          f"\nТелефон - {data["phone"]}"
                                          f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
-                                    message_id=data["msg_id"], reply_markup=main)
+                                    message_id=data["msg_id"], reply_markup=acceptation)
 
 
 # роль пользователя
@@ -148,18 +148,13 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
                                      f"\nТелефон - {data["phone"]}"
                                      f"\nРоль - {data["role"]}"
                                      f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
-                                message_id=data["msg_id"], reply_markup=main)
+                                message_id=data["msg_id"], reply_markup=acceptation)
 
 
 # кнопка "Да"
 @router.callback_query(F.data == 'yes')
 async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
-    await call.message.delete()
-    await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id-1)
-    msg = await bot.send_message(text="Поздравляем! Вы теперь зарегистрированы!", chat_id=call.message.chat.id,
-                           message_effect_id="5046509860389126442")
     data = await state.get_data()
-
     info = [call.message.from_user.id,
             call.message.from_user.username,
             data["role"],
@@ -170,14 +165,39 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
             data["phone"],
             str(datetime.now())[:19]
             ]
-    await set_user(info)
+    # проверка на ошибку при регистрации, если она возникает, то регистрацию нужно пройти заново
+    try:
+        await set_user(info)
+    except:
+        category = (await state.get_data())["category"]
+        await state.clear()
+        if category == 'admin':
+            await state.update_data(category=category)
+            await state.update_data(role=category)
+        else:
+            await state.update_data(category=category)
+        await call.message.edit_text(text="Возникла ошибка...Пройдите регистрацию заново\n<b>Введите имя</b>")
+        await state.set_state(Reg.name)
+        return
 
-    # фриз на 4 секунды, затем появляется меню
-    sleep(4)
-    await bot.edit_message_text(text=f"<b>МЕНЮ</b>",
-                                chat_id=call.message.chat.id,
-                                message_id=msg.message_id)
+    await call.message.delete()
+    await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id-1)
+    msg = await bot.send_message(text="Поздравляем! Вы теперь зарегистрированы!", chat_id=call.message.chat.id,
+                           message_effect_id="5046509860389126442")
+    await state.update_data(msg_id=msg.message_id) # переаривязка айди сообщения чтобы им было удобно управлять
 
+    # фриз на 3 секунды, затем появляется меню, вид меню определяется в зависимости от категории пользователя
+    sleep(3)
+    if data["category"] == "emp":
+        await bot.edit_message_text(text=f"<b>МЕНЮ</b>",
+                                    chat_id=call.message.chat.id,
+                                    message_id=msg.message_id,
+                                    reply_markup=emp_menu_kb)
+    else:
+        await bot.edit_message_text(text=f"<b>В вашем распоряжении следующие функции</b>",
+                                    chat_id=call.message.chat.id,
+                                    message_id=msg.message_id,
+                                    reply_markup=adm_menu_kb)
 
 
 # кнопка "Нет"
@@ -185,7 +205,12 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
 async def reg_repeat(call: CallbackQuery, bot: Bot, state: FSMContext):
     category = (await state.get_data())["category"]
     await state.clear()
-    await state.update_data(category=category)
+    # проверка админ или нет для правильного заполнения роли, иначе без этого выдает ошибку
+    if category == 'admin':
+        await state.update_data(category=category)
+        await state.update_data(role=category)
+    else:
+        await state.update_data(category=category)
     await state.update_data(msg_id=call.message.message_id)
     await call.message.edit_text(text="Заполняем заново...\n<b>Введите имя</b>")
     await state.set_state(Reg.name)

@@ -26,6 +26,7 @@ class User(Base):
     birthday: Mapped[str] = mapped_column(String(30))
     phone: Mapped[str] = mapped_column(String(30))
     reg_date: Mapped[str] = mapped_column(String(40))
+    points: Mapped[int] = mapped_column(default=0)
 
 
 async def async_main():
