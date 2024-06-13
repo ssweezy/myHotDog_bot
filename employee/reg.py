@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from utils.database.requests import set_user
+from utils.database.requests import set_user, user_exists
 from utils.FSM import Reg
 from utils.config import PASSWORD, PASSWORD_ADMIN
 from utils.kb.inline_kb import acceptation, emp_menu_kb, adm_menu_kb
@@ -16,11 +16,14 @@ router = Router()
 # приветствие и запрос пароля
 @router.message(Command('start'))
 async def hello(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(f"👋 Приветствуем {message.from_user.username}!")
-    msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
-    await state.update_data(msg_id=msg.message_id)
-    await bot.delete_message(chat_id=message.chat.id, message_id=msg.message_id - 2)
-    await state.set_state(Reg.password)
+    if not (await user_exists(message.from_user.id)):
+        await message.answer(f"👋 Приветствуем {message.from_user.username}!")
+        msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
+        await state.update_data(msg_id=msg.message_id)
+        await bot.delete_message(chat_id=message.chat.id, message_id=msg.message_id - 2)
+        await state.set_state(Reg.password)
+    else:
+        await message.delete()
 
 
 # проверка пароля или старт если человек зареган
@@ -155,8 +158,9 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
 @router.callback_query(F.data == 'yes')
 async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
-    info = [call.message.from_user.id,
-            call.message.from_user.username,
+    print(call.from_user)
+    info = [call.from_user.id,
+            call.from_user.username,
             data["role"],
             data["category"],
             data["name"],
@@ -184,7 +188,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id-1)
     msg = await bot.send_message(text="Поздравляем! Вы теперь зарегистрированы!", chat_id=call.message.chat.id,
                            message_effect_id="5046509860389126442")
-    await state.update_data(msg_id=msg.message_id) # переаривязка айди сообщения чтобы им было удобно управлять
+    await state.update_data(msg_id=msg.message_id) # перепривязка айди сообщения чтобы им было удобно управлять
 
     # фриз на 3 секунды, затем появляется меню, вид меню определяется в зависимости от категории пользователя
     sleep(3)
@@ -198,6 +202,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
                                     chat_id=call.message.chat.id,
                                     message_id=msg.message_id,
                                     reply_markup=adm_menu_kb)
+    await state.set_state(None)
 
 
 # кнопка "Нет"
