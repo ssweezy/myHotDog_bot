@@ -8,7 +8,9 @@ from aiogram.enums import ParseMode
 from utils.config import TOKEN
 from utils.database.models import async_main
 
-from employee.reg import router
+from employee.reg import router as r1
+from employee.emp_menu import router as r2
+from admin.handlers import router as r3
 
 
 async def main():
@@ -16,7 +18,7 @@ async def main():
     bot = Bot(token=TOKEN, default=DefaultBotProperties(
         parse_mode=ParseMode.HTML))
     dp = Dispatcher()
-    dp.include_router(router)
+    dp.include_routers(r1, r2, r3)
     await dp.start_polling(bot)
 
 
