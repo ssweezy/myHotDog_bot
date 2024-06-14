@@ -27,9 +27,11 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
         # проверка если есть юзер то отправить его на соответсвующее меню
         user_data = await get_user_info(message.from_user.id)
         if(user_data.category=='adm'):
-            await message.answer(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
+            msg = await message.answer(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
+            await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id - 2)
         elif(user_data.category=='emp'): 
-            await message.answer(f"<b>МЕНЮ</b>", reply_markup=emp_menu_kb)
+            msg = await message.answer(f"<b>МЕНЮ</b>", reply_markup=emp_menu_kb)
+            await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id - 2)
         else:
             await message.answer('У вас нет роли')
         await message.delete()
