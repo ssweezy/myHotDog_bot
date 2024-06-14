@@ -41,9 +41,3 @@ async def check_points(call: CallbackQuery):
 @router.callback_query(F.data == "back")
 async def func_back(call: CallbackQuery):
     await call.message.edit_text('<b>МЕНЮ</b>', reply_markup=emp_menu_kb)
-
-
-# удаляет не значащие сообщения
-@router.message()
-async def del_trash(message: Message):
-    await message.delete()

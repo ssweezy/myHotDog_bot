@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from utils.database.requests import set_user, user_exists, get_user_info
-from utils.FSM import Reg
+from utils.FSM import Reg, Employee
 from utils.config import PASSWORD, PASSWORD_ADMIN
 from utils.kb.inline_kb import acceptation, emp_menu_kb, adm_menu_kb
 

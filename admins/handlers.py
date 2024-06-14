@@ -16,9 +16,9 @@ router = Router()
 
 @router.callback_query(F.data == "employees")
 async def catalog(call: CallbackQuery, bot: Bot, state: FSMContext):
+    await state.set_state(Employee.full_name)
     msg = await call.message.answer('Выберите сотрудника', reply_markup= await get_all_employees())
     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-1)
-    await state.set_state(Employee.full_name)
 
 
 @router.message(Employee.full_name)
