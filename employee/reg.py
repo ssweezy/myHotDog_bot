@@ -16,6 +16,7 @@ router = Router()
 # приветствие и запрос пароля
 @router.message(Command('start'))
 async def hello(message: Message, bot: Bot, state: FSMContext):
+    # проверка если есть юзер то команда старт не будет работать
     if not (await user_exists(message.from_user.id)):
         await message.answer(f"👋 Приветствуем {message.from_user.username}!")
         msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
@@ -141,10 +142,14 @@ async def get_phone(message: Message, bot: Bot, state: FSMContext):
 # роль пользователя
 @router.message(Reg.role)
 async def get_role(message: Message, bot: Bot, state: FSMContext):
-    await state.update_data(role=message.text)
-    await message.delete()
     data = await state.get_data()
-    await bot.edit_message_text(text=f"<b>Ваши данные</b>"
+    if data["role"] != "":
+        await message.delete()
+    else:
+        await state.update_data(role=message.text)
+        data = await state.get_data()
+        await message.delete()
+        await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                      f"\nИмя - {data["name"]}"
                                      f"\nФамилия - {data["surname"]}"
                                      f"\nДата рождения - {data["birthday"]}"
@@ -152,6 +157,8 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
                                      f"\nРоль - {data["role"]}"
                                      f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
                                 message_id=data["msg_id"], reply_markup=acceptation)
+
+
 
 
 # кнопка "Да"
