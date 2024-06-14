@@ -5,18 +5,18 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 
-import admin.keyboards as kb
+from utils.FSM import Employee
+from utils.kb.reply_kb import get_all_employees
+from utils.kb.inline_kb import control_employee
+
 
 router = Router()
 
 
-class Employee(StatesGroup):
-    full_name = State()
-
 
 @router.callback_query(F.data == "employees")
 async def catalog(call: CallbackQuery, bot: Bot, state: FSMContext):
-    msg = await call.message.answer('Выбери сотрудника', reply_markup= await kb.get_all_employees())
+    msg = await call.message.answer('Выберите сотрудника', reply_markup= await get_all_employees())
     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-1)
     await state.set_state(Employee.full_name)
 
@@ -25,7 +25,7 @@ async def catalog(call: CallbackQuery, bot: Bot, state: FSMContext):
 async def emplfulnm(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(full_name=message.text)
     data = await state.get_data()
-    msg = await message.answer(f'Сотрудник: {data["full_name"]}', reply_markup = kb.control_employee)
+    msg = await message.answer(f'Сотрудник: {data["full_name"]}', reply_markup = control_employee)
     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-1)
     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id-2)
     await state.clear()
