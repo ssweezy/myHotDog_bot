@@ -28,28 +28,19 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
 @router.message(Reg.password)
 async def pass_check(message: Message, bot: Bot, state: FSMContext):
 
-    # регистрация для сотрудников
-    if message.text == PASSWORD:
-        data = await state.get_data()
-        await message.delete()
-        await bot.edit_message_text(text="🔓 Вы успешно вошли в систему!\nВведите <b>имя:</b>",
+    data = await state.get_data()
+    await message.delete()
+    await bot.edit_message_text(text="🔓 Вы успешно вошли в систему!\nВведите <b>имя:</b>",
                                     chat_id=message.chat.id,
                                     message_id=data["msg_id"])
-        await state.update_data(tg_id=message.from_user.id)
-        await state.update_data(tg_username=message.from_user.username)
+    # регистрация для сотрудников
+    if message.text == PASSWORD:
         await state.update_data(role="")
         await state.update_data(category="emp")
         await state.set_state(Reg.name)
 
     # регистрация для админов
     elif message.text == PASSWORD_ADMIN:
-        data = await state.get_data()
-        await message.delete()
-        await bot.edit_message_text(text="🔓 Вы успешно вошли в систему как <b>управляющий</b>!\nВведите <b>имя:</b>",
-                                    chat_id=message.chat.id,
-                                    message_id=data["msg_id"])
-        await state.update_data(tg_id=message.from_user.id)
-        await state.update_data(tg_username=message.from_user.username)
         await state.update_data(role="adm")
         await state.update_data(category="adm")
         await state.set_state(Reg.name)
@@ -71,6 +62,10 @@ async def get_name(message: Message, bot: Bot ,state: FSMContext):
     await state.update_data(name=message.text)
     data = await state.get_data()
     await message.delete()
+
+    await state.update_data(tg_id=message.from_user.id)
+    await state.update_data(tg_username=message.from_user.username)
+
     await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                      f"\nИмя - {data["name"]}"
                                      f"\nВведите <b>фамилию:</b>", chat_id=message.chat.id,
@@ -156,8 +151,8 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
 @router.callback_query(F.data == 'yes')
 async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
-    info = [call.message.from_user.id,
-            call.message.from_user.username,
+    info = [data["tg_id"],
+            data["tg_username"],
             data["role"],
             data["category"],
             data["name"],
