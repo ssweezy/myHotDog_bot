@@ -8,7 +8,8 @@ from aiogram.fsm.context import FSMContext
 from utils.database.requests import set_user
 from utils.FSM import Reg
 from utils.config import PASSWORD, PASSWORD_ADMIN
-from utils.kb.inline_kb import acceptation, emp_menu_kb, adm_menu_kb
+from utils.kb.inline_kb import acceptation, emp_menu_kb
+from admin.keyboards import adm_main
 
 router = Router()
 
@@ -197,7 +198,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
         await bot.edit_message_text(text=f"<b>В вашем распоряжении следующие функции</b>",
                                     chat_id=call.message.chat.id,
                                     message_id=msg.message_id,
-                                    reply_markup=adm_menu_kb)
+                                    reply_markup=adm_main)
 
 
 # кнопка "Нет"

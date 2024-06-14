@@ -1,18 +1,16 @@
-from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton)
+from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton)
 
 from admin.requests import get_employees
 
 
-main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Сотрудники'),
-                                      KeyboardButton(text='Сделать Рассылку')]],
-                            resize_keyboard=True,
-                            input_field_placeholder='Выбрать действие')
+adm_main = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Сотрудники", callback_data="employees")],
+    [InlineKeyboardButton(text="Сделать Рассылку", callback_data="mail")]])
 
 
-control_employee = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Начислить бонусы сотруднику'),
-                                                  KeyboardButton(text='Списать бонусы с сотрудника')]],
-                                        resize_keyboard=True,
-                                        input_field_placeholder='Выбрать действие')
+control_employee = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Начислить бонусы сотруднику', callback_data='send_bonus')],
+    [InlineKeyboardButton(text='Списать бонусы с сотрудника', callback_data='take_back_bonus')]])
 
 
 async def get_all_employees():
