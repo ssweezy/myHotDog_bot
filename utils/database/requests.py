@@ -36,3 +36,9 @@ async def user_exists(tg_id):
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
         return True if user else False  # однострочное условие возвращает True/False,
+
+
+# получение всех сотрудников
+async def get_employees():
+    async with async_session() as session:
+        return await session.scalars(select(User).where(User.category == "emp"))

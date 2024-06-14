@@ -159,8 +159,6 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
                                 message_id=data["msg_id"], reply_markup=acceptation)
 
 
-
-
 # кнопка "Да"
 @router.callback_query(F.data == 'yes')
 async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
