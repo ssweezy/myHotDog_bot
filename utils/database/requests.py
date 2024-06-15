@@ -48,3 +48,9 @@ async def get_user_info(tg_id):
 async def get_employees():
     async with async_session() as session:
         return await session.scalars(select(User).where(User.category == "emp"))
+    
+
+# получение ID всех сотрудников
+async def get_all_ID():
+    async with async_session() as session:
+        return await session.scalars(select(User.tg_id).where(User.category == "emp"))

@@ -22,3 +22,8 @@ class Menu(StatesGroup):
 
 class Employee(StatesGroup):
     full_name = State()
+
+
+# для рассылки
+class mail_state(StatesGroup):
+    msg = State()
