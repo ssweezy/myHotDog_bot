@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from utils.database.requests import set_user, user_exists
+from utils.database.requests import set_user, user_exists, get_user_info
 from utils.FSM import Reg
 from utils.config import PASSWORD, PASSWORD_ADMIN
 from utils.kb.inline_kb import acceptation, emp_menu_kb, adm_menu_kb
@@ -20,11 +20,23 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
     if not (await user_exists(message.from_user.id)):
         await message.answer(f"👋 Приветствуем {message.from_user.username}!")
         msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
-        await state.update_data(msg_id=msg.message_id)
-        await bot.delete_message(chat_id=message.chat.id, message_id=msg.message_id - 2)
+        await state.update_data(msg_id=msg.message_id)  # сохранение айди сообщения для дальнейшей работы
+        await message.delete()  # удаление сообщения /start
         await state.set_state(Reg.password)
     else:
-        await message.delete()
+        # отправка юзеру соответсвующее ему меню
+        user_data = await get_user_info(message.from_user.id)
+        data = await state.get_data()
+        if user_data.category == 'adm':
+            msg = await message.answer(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
+            await bot.delete_message(chat_id=message.chat.id, message_id=data["msg_id"])
+            await message.delete()
+            await state.update_data(msg_id=msg.message_id)
+        else:
+            msg = await message.answer(f"<b>МЕНЮ</b>", reply_markup=emp_menu_kb)
+            await bot.delete_message(chat_id=message.chat.id, message_id=data["msg_id"])
+            await message.delete()
+            await state.update_data(msg_id=msg.message_id)
 
 
 # проверка пароля или старт если человек зареган
@@ -113,12 +125,13 @@ async def get_birthday(message: Message, bot: Bot ,state: FSMContext):
 # номер телефона
 @router.message(Reg.phoneNum)
 async def get_phone(message: Message, bot: Bot, state: FSMContext):
-    await state.update_data(phone=message.text)
     data = await state.get_data()
-    await message.delete()
 
     # если пользователь, то ему нужно вводить свою роль
     if data["category"] == 'emp':
+        await message.delete()
+        await state.update_data(phone=message.text)
+        data = await state.get_data()
         await bot.edit_message_text(text=f"<b>Ваши данные</b>"
                                          f"\nИмя - {data["name"]}"
                                          f"\nФамилия - {data["surname"]}"
@@ -128,15 +141,23 @@ async def get_phone(message: Message, bot: Bot, state: FSMContext):
                                     message_id=data["msg_id"])
         await state.set_state(Reg.role)
 
-    # если пользователь админ, то ему не нужно указывать свою роль, смотрите line 52
+    # если пользователь админ, то ему не нужно указывать свою роль, смотрите pass_check line ~52
     else:
-        await bot.edit_message_text(text=f"<b>Ваши данные</b>"
-                                         f"\nИмя - {data["name"]}"
-                                         f"\nФамилия - {data["surname"]}"
-                                         f"\nДата рождения - {data["birthday"]}"
-                                         f"\nТелефон - {data["phone"]}"
-                                         f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
-                                    message_id=data["msg_id"], reply_markup=acceptation)
+        # если человек ввел уже свой номер телефона, то при повторном вводе он не будет меняться
+        if "phone" not in data:
+            await message.delete()
+            await state.update_data(phone=message.text)
+            data = await state.get_data()
+            await bot.edit_message_text(text=f"<b>Ваши данные</b>"
+                                             f"\nИмя - {data["name"]}"
+                                             f"\nФамилия - {data["surname"]}"
+                                             f"\nДата рождения - {data["birthday"]}"
+                                             f"\nТелефон - {data["phone"]}"
+                                             f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
+                                        message_id=data["msg_id"], reply_markup=acceptation)
+            await state.set_state(Reg.acceptation)
+        else:
+            await message.delete()
 
 
 # роль пользователя
@@ -157,10 +178,11 @@ async def get_role(message: Message, bot: Bot, state: FSMContext):
                                      f"\nРоль - {data["role"]}"
                                      f"\n\n<b>Все верно?</b>", chat_id=message.chat.id,
                                 message_id=data["msg_id"], reply_markup=acceptation)
+        await state.set_state(Reg.acceptation)
 
 
 # кнопка "Да"
-@router.callback_query(F.data == 'yes')
+@router.callback_query(F.data == "yes")
 async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
     print(call.from_user)
@@ -180,7 +202,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     except:
         category = (await state.get_data())["category"]
         await state.clear()
-        if category == 'admin':
+        if category == 'adm':
             await state.update_data(category=category)
             await state.update_data(role=category)
         else:
@@ -202,6 +224,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
                                     chat_id=call.message.chat.id,
                                     message_id=msg.message_id,
                                     reply_markup=emp_menu_kb)
+    # админская панель
     else:
         await bot.edit_message_text(text=f"<b>В вашем распоряжении следующие функции</b>",
                                     chat_id=call.message.chat.id,
@@ -211,16 +234,18 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
 
 
 # кнопка "Нет"
-@router.callback_query(F.data == 'no')
+@router.callback_query(F.data == 'no') # добавил проверку на стейт
+# роль потому что клавиатура acceptation используется в других файлах кода (admins/main функция send_or_not
 async def reg_repeat(call: CallbackQuery, bot: Bot, state: FSMContext):
     category = (await state.get_data())["category"]
     await state.clear()
     # проверка админ или нет для правильного заполнения роли, иначе без этого выдает ошибку
-    if category == 'admin':
+    if category == 'adm':
         await state.update_data(category=category)
         await state.update_data(role=category)
     else:
         await state.update_data(category=category)
+        await state.update_data(role='')
     await state.update_data(msg_id=call.message.message_id)
     await call.message.edit_text(text="Заполняем заново...\n<b>Введите имя</b>")
     await state.set_state(Reg.name)

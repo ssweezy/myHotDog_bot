@@ -9,6 +9,7 @@ class Reg(StatesGroup):
     birthday = State()
     phoneNum = State()
     role = State()
+    acceptation = State()
 
 
 # для меню
@@ -20,5 +21,9 @@ class Menu(StatesGroup):
 
 
 
-class Employee(StatesGroup):
-    full_name = State()
+class Choose_emp(StatesGroup):
+    Emp = State()
+    Ask_points_amount = State()
+    Points_amount = State()
+    Msg_with_points = State()
+    Acceptation = State()
