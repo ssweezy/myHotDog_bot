@@ -35,3 +35,13 @@ class ChooseEmpTakePoints(StatesGroup):
     Points_amount = State()
     Msg_with_points = State()
     Acceptation = State()
+
+
+# для отправления личного сообщения сотруднику
+class SendMsgToEmp(StatesGroup):
+    msg_to_send = State()
+
+
+# для рассылки
+class SendMsgToAllEmp(StatesGroup):
+    msg_to_send = State()

@@ -8,7 +8,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 from utils.FSM import ChooseEmpTakePoints, Menu
 from utils.database.requests import get_user_info, update_user_points
-from utils.kb.inline_kb import control_employee, all_emp_kb, acceptation_points, adm_menu_kb
+from utils.kb.inline_kb import back_kb, all_emp_kb, acceptation_points, adm_menu_kb
 
 
 router = Router()
@@ -16,7 +16,7 @@ router = Router()
 
 @router.callback_query(F.data == 'take_back_points')
 async def ask_points_amount(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text("Сколько баллов <b>списать</b> у сотрудника?")
+    await call.message.edit_text("Сколько баллов <b>списать</b> у сотрудника?", reply_markup=back_kb)
     await state.set_state(ChooseEmpTakePoints.Points_amount)
     await call.answer()
 

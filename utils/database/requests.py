@@ -49,8 +49,7 @@ async def get_user_info(tg_id):
 # получение всех сотрудников
 async def get_employees():
     async with async_session() as session:
-        emps = await session.scalars(select(User).where(User.category == "emp"))
-        return emps
+        return await session.scalars(select(User).where(User.category == "emp"))
 
 
 # меняет количество очков пользователя используя его айди

@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from utils.database.requests import get_employees
@@ -16,6 +16,21 @@ acceptation_points = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Да", callback_data="yes_p"),
      InlineKeyboardButton(text='Нет', callback_data='no_p')]
     ])
+
+
+# клавиатура для подтверждения информации при отправлении сообщения
+acceptation_msg = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Да", callback_data="yes_m"),
+     InlineKeyboardButton(text='Нет', callback_data='no_m')]
+    ])
+
+
+# клавиатура для подтверждения информации при рассылке
+acceptation_msg_all = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Да", callback_data="yes_a"),
+     InlineKeyboardButton(text='Нет', callback_data='no_a')]
+    ])
+
 
 # клавиатура для меню сотрудников
 emp_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -42,7 +57,8 @@ back_points_kb = InlineKeyboardMarkup(inline_keyboard=[
 # админская клавиатура
 adm_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Сотрудники", callback_data="employees")],
-    [InlineKeyboardButton(text="Сделать Рассылку", callback_data="mail")],
+    [InlineKeyboardButton(text="Рейтинг", callback_data="rating")],
+    [InlineKeyboardButton(text="Сделать Рассылку", callback_data="mail")]
     ])
 
 

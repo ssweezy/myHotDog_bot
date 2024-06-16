@@ -1,11 +1,11 @@
 from aiogram import Router, F, Bot
-from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from utils.FSM import Menu
+
 from utils.kb.inline_kb import emp_menu_kb, back_kb, back_points_kb, adm_menu_kb
 from utils.database.requests import get_points
+from utils.fucntions import update_data
 
 # в этом файле будет проходить вся обработка кнопок в меню
 
@@ -40,6 +40,7 @@ async def check_points(call: CallbackQuery):
 # функция для обработки нажатия на кнопку "назад"
 @router.callback_query(F.data == "back")
 async def func_back(call: CallbackQuery, state: FSMContext):
+    await update_data(call.from_user.id, call.message.chat.id, state)
     data = await state.get_data()
     if data["category"] == "emp":
         await call.message.edit_text('<b>МЕНЮ</b>', reply_markup=emp_menu_kb)
@@ -49,7 +50,3 @@ async def func_back(call: CallbackQuery, state: FSMContext):
         await state.set_state(None)
 
 
-# удаляет не значащие сообщения
-# @router.message()
-# async def del_trash(message: Message):
-#     await message.delete()

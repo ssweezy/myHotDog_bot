@@ -9,6 +9,8 @@ from utils.database.requests import set_user, user_exists, get_user_info, update
 from utils.FSM import Reg
 from utils.config import PASSWORD, PASSWORD_ADMIN
 from utils.kb.inline_kb import acceptation_reg, emp_menu_kb, adm_menu_kb
+from utils.fucntions import update_data
+
 
 router = Router()
 
@@ -21,29 +23,20 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
         await message.answer(f"👋 Приветствуем!")
         msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
         await state.update_data(msg_id=msg.message_id)  # сохранение айди сообщения для дальнейшей работы
-        await message.delete()  # удалениеa сообщения /start
+        await message.delete()  # удаление сообщения /start
         await state.set_state(Reg.password)
         data = await state.get_data()
         print(data)
     else:
         # переприсваивание данных в statedata для того чтобы не возникали ошибки при перезапуске
-        user = await get_user_info(message.from_user.id)
-        await state.update_data(tg_id=user.tg_id)
-        await state.update_data(tg_username=user.tg_username)
-        await state.update_data(role=user.role)
-        await state.update_data(category=user.category)
-        await state.update_data(name=user.name)
-        await state.update_data(surname=user.surname)
-        await state.update_data(birthday=user.birthday)
-        await state.update_data(phone=user.phone)
-        await state.update_data(msg_id=user.msg_id)
-        await state.update_data(chat_id=message.chat.id)
-
+        await update_data(message.from_user.id, message.chat.id, state)
 
         # отправка юзеру соответсвующее ему меню
         user_data = await get_user_info(message.from_user.id)
         data = await state.get_data()
         print(data["msg_id"])
+
+        # меню для админа
         if user_data.category == 'adm':
             msg = await message.answer(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
             await bot.delete_message(chat_id=data["chat_id"], message_id=data["msg_id"])
@@ -51,6 +44,8 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
             await state.update_data(msg_id=msg.message_id)
             await update_msg_id(message.from_user.id, msg.message_id)
             await state.set_state(None)
+
+        # меню для сотрудника
         else:
             msg = await message.answer(f"<b>МЕНЮ</b>", reply_markup=emp_menu_kb)
             await bot.delete_message(chat_id=data["chat_id"], message_id=data["msg_id"])
@@ -239,7 +234,7 @@ async def reg_db(call: CallbackQuery, bot: Bot, state: FSMContext):
     msg = await bot.send_message(text="Поздравляем! Вы теперь зарегистрированы!", chat_id=call.message.chat.id,
                            message_effect_id="5046509860389126442")
     await state.update_data(msg_id=msg.message_id)  # перепривязка айди сообщения чтобы им было удобно управлять
-    await update_msg_id(call.from_user.id, msg.message_id)  # перепривязка айди юзера в бд потому что изначально он там неправильное
+    await update_msg_id(call.from_user.id, msg.message_id)  # перепривязка айди сообщения в бд потому что изначально он там неправильное
     await call.answer()
     # фриз на 3 секунды, затем появляется меню, вид меню определяется в зависимости от категории пользователя
     sleep(3)

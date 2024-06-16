@@ -8,7 +8,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 from utils.FSM import ChooseEmpSendPoints, Menu
 from utils.database.requests import get_user_info, update_user_points
-from utils.kb.inline_kb import control_employee, all_emp_kb, acceptation_points, adm_menu_kb
+from utils.kb.inline_kb import back_kb, all_emp_kb, acceptation_points, adm_menu_kb
 
 
 router = Router()
@@ -17,7 +17,7 @@ router = Router()
 # запрос количества баллов для зачисления сотруднику CALLBACK идет от клавиатуры control_employee
 @router.callback_query(F.data == 'send_points')
 async def ask_points_amount(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text("Сколько баллов <b>начислить</b> сотруднику?")
+    await call.message.edit_text("Сколько баллов <b>начислить</b> сотруднику?", reply_markup=back_kb)
     await state.set_state(ChooseEmpSendPoints.Points_amount)
     await call.answer()
 
@@ -97,3 +97,5 @@ async def send_or_not(call: CallbackQuery, bot: Bot, state: FSMContext):
         sleep(0.5)
         await call.message.edit_text("Выберите сотрудника:", reply_markup=await all_emp_kb())
         await state.set_state(Menu.show_emp)
+
+
