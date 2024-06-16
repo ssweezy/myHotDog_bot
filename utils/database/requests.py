@@ -5,7 +5,7 @@ from sqlalchemy import select, update, delete
 
 # добавление сотрудника в бд
 async def set_user(data):
-    tg_id, tg_username, role, category, name, surname, birthday, phone, reg_date, msg_id = data
+    tg_id, tg_username, role, category, name, surname, birthday, phone, reg_date, msg_id, chat_id = data
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
@@ -19,7 +19,8 @@ async def set_user(data):
                              birthday=birthday,
                              phone=phone,
                              reg_date=reg_date,
-                             msg_id=msg_id
+                             msg_id=msg_id,
+                             chat_id=chat_id
                              ))
             await session.commit()
 

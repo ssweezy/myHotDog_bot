@@ -11,6 +11,8 @@ from utils.database.models import async_main
 from employee.reg import router as r1
 from employee.emp_menu import router as r2
 from admins.menu import router as r3
+from admins.send_points import router as r4
+from admins.take_back_points import router as r5
 
 
 async def main():
@@ -18,7 +20,7 @@ async def main():
     bot = Bot(token=TOKEN, default=DefaultBotProperties(
         parse_mode=ParseMode.HTML))
     dp = Dispatcher()
-    dp.include_routers(r1, r2, r3)
+    dp.include_routers(r1, r2, r3, r4, r5)
     await dp.start_polling(bot)
 
 

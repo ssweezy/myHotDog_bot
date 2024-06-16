@@ -21,8 +21,10 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
         await message.answer(f"👋 Приветствуем!")
         msg = await message.answer("🔐 Для регистрации вам необходимо ввести код-пароль.\nВведите пароль:")
         await state.update_data(msg_id=msg.message_id)  # сохранение айди сообщения для дальнейшей работы
-        await message.delete()  # удаление сообщения /start
+        await message.delete()  # удалениеa сообщения /start
         await state.set_state(Reg.password)
+        data = await state.get_data()
+        print(data)
     else:
         # переприсваивание данных в statedata для того чтобы не возникали ошибки при перезапуске
         user = await get_user_info(message.from_user.id)
@@ -32,6 +34,7 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
         await state.update_data(category=user.category)
         await state.update_data(name=user.name)
         await state.update_data(surname=user.surname)
+        await state.update_data(birthday=user.birthday)
         await state.update_data(phone=user.phone)
         await state.update_data(msg_id=user.msg_id)
         await state.update_data(chat_id=message.chat.id)
@@ -40,6 +43,7 @@ async def hello(message: Message, bot: Bot, state: FSMContext):
         # отправка юзеру соответсвующее ему меню
         user_data = await get_user_info(message.from_user.id)
         data = await state.get_data()
+        print(data["msg_id"])
         if user_data.category == 'adm':
             msg = await message.answer(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
             await bot.delete_message(chat_id=data["chat_id"], message_id=data["msg_id"])
@@ -99,7 +103,7 @@ async def pass_check(message: Message, bot: Bot, state: FSMContext):
 
 # имя
 @router.message(Reg.name)
-async def get_name(message: Message, bot: Bot ,state: FSMContext):
+async def get_name(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(name=message.text)
     data = await state.get_data()
     await message.delete()

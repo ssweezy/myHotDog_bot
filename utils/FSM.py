@@ -16,13 +16,21 @@ class Reg(StatesGroup):
 class Menu(StatesGroup):
     emp_menu = State()
     adm_menu = State()
+    show_emp = State()
     cabinet = State()
     points = State()
 
 
+# для отправки баллов
+class ChooseEmpSendPoints(StatesGroup):
+    Ask_points_amount = State()
+    Points_amount = State()
+    Msg_with_points = State()
+    Acceptation = State()
 
-class Choose_emp(StatesGroup):
-    Emp = State()
+
+# для отправки баллов
+class ChooseEmpTakePoints(StatesGroup):
     Ask_points_amount = State()
     Points_amount = State()
     Msg_with_points = State()

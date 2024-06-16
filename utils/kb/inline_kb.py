@@ -48,8 +48,8 @@ adm_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
 
 # начисление баллов сотрудникам
 control_employee = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Начислить бонусы', callback_data='send_bonus')],
-    [InlineKeyboardButton(text='Списать бонусы', callback_data='take_back_bonus')],
+    [InlineKeyboardButton(text='Начислить бонусы', callback_data='send_points')],
+    [InlineKeyboardButton(text='Списать бонусы', callback_data='take_back_points')],
     [InlineKeyboardButton(text="Отправить сообщение сотруднику", callback_data="send_msg")],
     [InlineKeyboardButton(text="Назад", callback_data="back")]
     ])
