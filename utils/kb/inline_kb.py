@@ -5,11 +5,17 @@ from utils.database.requests import get_employees
 
 
 # клавиатура для подтверждения корректности информации при регистрации
-acceptation = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Да", callback_data="yes"),
-     InlineKeyboardButton(text='Нет', callback_data='no')]
+acceptation_reg = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Да", callback_data="yes_r"),
+     InlineKeyboardButton(text='Нет', callback_data='no_r')]
     ])
 
+
+# клавиатура для подтверждения информации при начислении баллов
+acceptation_points = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Да", callback_data="yes_p"),
+     InlineKeyboardButton(text='Нет', callback_data='no_p')]
+    ])
 
 # клавиатура для меню сотрудников
 emp_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -53,9 +59,9 @@ control_employee = InlineKeyboardMarkup(inline_keyboard=[
 async def all_emp_kb():
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text='Назад', callback_data="back"))
-    for emp in await get_employees():
+    for emp in (await get_employees()):
         kb.add(InlineKeyboardButton(text=f'{emp.name} {emp.surname}', callback_data=f"{emp.tg_id}"))
-    return kb.as_markup()
+    return kb.adjust(1).as_markup()
 
 
 

@@ -18,7 +18,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id = mapped_column(BigInteger)
-    tg_username: Mapped[str] = mapped_column(String(30))
+    tg_username: Mapped[str] = mapped_column(String(30), default='отсутствует')
     role: Mapped[str] = mapped_column(String(20))
     category: Mapped[str] = mapped_column(String(20))
     name: Mapped[str] = mapped_column(String(30))
@@ -26,10 +26,12 @@ class User(Base):
     birthday: Mapped[str] = mapped_column(String(30))
     phone: Mapped[str] = mapped_column(String(30))
     reg_date: Mapped[str] = mapped_column(String(40))
+    msg_id: Mapped[int] = mapped_column(default=0)
+    chat_id: Mapped[int] = mapped_column(default=0)
     points: Mapped[int] = mapped_column(default=0)
 
 
 async def async_main():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)  # =========УБРАТЬ ПОСЛЕ ЗАПУСКА!!
+        # await conn.run_sync(Base.metadata.drop_all)  # =========УБРАТЬ ПОСЛЕ ЗАПУСКА!!
         await conn.run_sync(Base.metadata.create_all)

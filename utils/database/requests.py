@@ -5,7 +5,7 @@ from sqlalchemy import select, update, delete
 
 # добавление сотрудника в бд
 async def set_user(data):
-    tg_id, tg_username, role, category, name, surname,birthday ,phone, reg_date = data
+    tg_id, tg_username, role, category, name, surname, birthday, phone, reg_date, msg_id = data
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
@@ -18,7 +18,8 @@ async def set_user(data):
                              surname=surname,
                              birthday=birthday,
                              phone=phone,
-                             reg_date=reg_date
+                             reg_date=reg_date,
+                             msg_id=msg_id
                              ))
             await session.commit()
 
@@ -47,10 +48,18 @@ async def get_user_info(tg_id):
 # получение всех сотрудников
 async def get_employees():
     async with async_session() as session:
-        return await session.scalars(select(User).where(User.category == "emp"))
+        emps = await session.scalars(select(User).where(User.category == "emp"))
+        return emps
 
 
 # меняет количество очков пользователя используя его айди
 async def update_user_points(tg_id, new_value: int):
     async with async_session() as session:
         await session.execute(update(User).where(User.tg_id == tg_id).values(points=new_value))
+        await session.commit()
+
+
+async def update_msg_id(tg_id, new_value):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.tg_id == tg_id).values(msg_id=new_value))
+        await session.commit()

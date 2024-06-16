@@ -49,8 +49,7 @@ async def func_back(call: CallbackQuery, state: FSMContext):
         await state.set_state(None)
 
 
-
 # удаляет не значащие сообщения
-@router.message()
-async def del_trash(message: Message):
-    await message.delete()
+# @router.message()
+# async def del_trash(message: Message):
+#     await message.delete()
