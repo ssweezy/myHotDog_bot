@@ -13,6 +13,7 @@ class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
+# база данных пользователей
 class User(Base):
     __tablename__ = 'users'
 
@@ -29,6 +30,16 @@ class User(Base):
     msg_id: Mapped[int] = mapped_column(default=0)
     chat_id: Mapped[int] = mapped_column(default=0)
     points: Mapped[int] = mapped_column(default=0)
+
+
+# база данных с file_id видео обучения
+class Video(Base):
+    __tablename__ = 'videos'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    file_id: Mapped[str] = mapped_column(String(500))
+    # video_name: Mapped[str] = mapped_column(String(20))
+    # video_caption: Mapped[str] = mapped_column(String(500), default=None)
 
 
 async def async_main():

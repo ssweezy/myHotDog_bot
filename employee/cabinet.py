@@ -37,16 +37,6 @@ async def check_points(call: CallbackQuery):
     await call.message.edit_text(text=call.message.text+f"\nУ вас <b>{points}</b> баллов", reply_markup=back_kb)
 
 
-# функция для обработки нажатия на кнопку "назад"
-@router.callback_query(F.data == "back")
-async def func_back(call: CallbackQuery, state: FSMContext):
-    await update_data(call.from_user.id, call.message.chat.id, state)
-    data = await state.get_data()
-    if data["category"] == "emp":
-        await call.message.edit_text('<b>МЕНЮ</b>', reply_markup=emp_menu_kb)
-        await state.set_state(None)
-    else:
-        await call.message.edit_text(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
-        await state.set_state(None)
+
 
 

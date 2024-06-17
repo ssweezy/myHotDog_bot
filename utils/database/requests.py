@@ -1,5 +1,5 @@
 from utils.database.models import async_session
-from utils.database.models import User
+from utils.database.models import User, Video
 from sqlalchemy import select, update, delete
 
 
@@ -62,4 +62,17 @@ async def update_user_points(tg_id, new_value: int):
 async def update_msg_id(tg_id, new_value):
     async with async_session() as session:
         await session.execute(update(User).where(User.tg_id == tg_id).values(msg_id=new_value))
+        await session.commit()
+
+
+# получение file_id выбранного видео
+async def get_file_id(video_num):  # параметр video это число видео по порядку
+    async with async_session() as session:
+        return await session.scalar(select(Video.file_id).where(Video.id == video_num))
+
+
+# изменение выбранного видео
+async def update_file_id(video_num: int, new_file_id):
+    async with async_session() as session:
+        await session.execute(update(Video).where(Video.id == video_num).values(file_id=new_file_id))
         await session.commit()

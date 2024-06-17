@@ -36,7 +36,7 @@ acceptation_msg_all = InlineKeyboardMarkup(inline_keyboard=[
 emp_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Мой кабинет", callback_data="cabinet")],
     [InlineKeyboardButton(text="За что начисляем баллы?", url="https://telegra.ph/MYHOTDOG-Bally-06-13")],
-    [InlineKeyboardButton(text="Пройти обучение", callback_data="tutor")]
+    [InlineKeyboardButton(text="Пройти обучение", callback_data="learn")]
     ])
 
 
@@ -58,8 +58,9 @@ back_points_kb = InlineKeyboardMarkup(inline_keyboard=[
 adm_menu_kb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Сотрудники", callback_data="employees")],
     [InlineKeyboardButton(text="Рейтинг", callback_data="rating")],
-    [InlineKeyboardButton(text="Сделать Рассылку", callback_data="mail")]
-    ])
+    [InlineKeyboardButton(text="Сделать Рассылку", callback_data="mail")],
+    [InlineKeyboardButton(text="Настройки", callback_data="settings")]
+])
 
 
 # начисление баллов сотрудникам
@@ -78,6 +79,23 @@ async def all_emp_kb():
     for emp in (await get_employees()):
         kb.add(InlineKeyboardButton(text=f'{emp.name} {emp.surname}', callback_data=f"{emp.tg_id}"))
     return kb.adjust(1).as_markup()
+
+
+# меню доступных настроек
+settings_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Настроить обучение", callback_data="change_learn")],
+    [InlineKeyboardButton(text="Назад", callback_data="back")]
+    ])
+
+
+# настройка обучения
+learn_settings_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="заменить видео 1", callback_data="replace_1")],
+    [InlineKeyboardButton(text="заменить видео 2", callback_data="replace_2")],
+    [InlineKeyboardButton(text="заменить видео 3", callback_data="replace_3")],
+    [InlineKeyboardButton(text="назад", callback_data="back")]
+
+    ])
 
 
 

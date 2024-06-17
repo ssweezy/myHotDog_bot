@@ -26,7 +26,7 @@ async def show_user_info(call: CallbackQuery, state: FSMContext):
     # присваивание айди юзера в data чтобы можно было дальше с ним работать
     await state.update_data(choose_emp_id=call.data)
     await call.message.edit_text("<b>Информация по сотруднику:</b>"
-                                 f"\nФИ - {user.name} {user.surname}"
+                                 f"\n\nФИ - {user.name} {user.surname}"
                                  f"\nТелеграм юзернейм - {user.tg_username}"
                                  f"\nРоль - {user.role}"
                                  f"\nДата регистрации в бот - {user.reg_date}"

@@ -33,7 +33,8 @@ async def confirm_send_msg(message: Message, state: FSMContext, bot: Bot):
 async def sending_msg(call: CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     await bot.send_message(text=f"📩 Новое личное сообщение от управляющего:"
-                                f"\n<blockquote>{data["msg_to_send"]}</blockquote>",
+                                f"\n<blockquote>{data["msg_to_send"]}</blockquote>"
+                                f"\n\nОтправить?",
                            chat_id=data["choose_emp_id"])
     await call.message.edit_text("<b>Сообщение успешно отправлено!</b>")
     sleep(2)

@@ -45,3 +45,8 @@ class SendMsgToEmp(StatesGroup):
 # для рассылки
 class SendMsgToAllEmp(StatesGroup):
     msg_to_send = State()
+
+
+# для настройки обучения
+class Learning(StatesGroup):
+    GetVideo = State()

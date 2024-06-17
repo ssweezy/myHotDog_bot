@@ -1,7 +1,10 @@
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import Router, F, Bot
+from aiogram.types import Message, CallbackQuery
+from aiogram.fsm.context import FSMContext
 
 from utils.database.requests import get_user_info
+from utils.kb.inline_kb import emp_menu_kb, adm_menu_kb
+
 
 # данный файл хранит в себе функции для общего использования
 
@@ -22,6 +25,25 @@ async def update_data(user_id, chat_id, state):
     await state.update_data(phone=user.phone)
     await state.update_data(msg_id=user.msg_id)
     await state.update_data(chat_id=chat_id)
+
+
+# функция для обработки нажатия на кнопку "назад"
+@router.callback_query(F.data == "back")
+async def func_back(call: CallbackQuery, state: FSMContext, bot: Bot):
+    await update_data(call.from_user.id, call.message.chat.id, state)
+    data = await state.get_data()
+    if data["category"] == "emp":
+        await call.message.edit_text('<b>МЕНЮ</b>', reply_markup=emp_menu_kb)
+        await state.set_state(None)
+    else:
+        # удаление видео при замене видео, learning_settings line ~24, используется данная конструкция потому что видео
+        # не всегда существует в чате и попытка его удаления вызовет ошибку
+        try:
+            await bot.delete_message(chat_id=call.message.chat.id, message_id=data["video_id"])
+        except:
+            pass
+        await call.message.edit_text(f"<b>В вашем распоряжении следующие функции</b>", reply_markup=adm_menu_kb)
+        await state.set_state(None)
 
 
 # удаляет не значащие сообщения
